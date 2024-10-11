@@ -161,6 +161,8 @@ bot.on('message', async (msg) => {
             await bot.sendPhoto(chatId, msg.photo[0].file_id, { caption: msg.caption, reply_markup: msg.reply_markup });
         } else if (msg.video) {
             await bot.sendVideo(chatId, msg.video.file_id, { caption: msg.caption, reply_markup: msg.reply_markup });
+        } else if (msg.video_note) {  // This is for Telegram circle video messages
+            await bot.sendVideoNote(chatId, msg.video_note.file_id, { reply_markup: msg.reply_markup });
         } else if (msg.document) {
             await bot.sendDocument(chatId, msg.document.file_id, { caption: msg.caption, reply_markup: msg.reply_markup });
         } else if (msg.audio) {
@@ -200,6 +202,8 @@ bot.on('callback_query', async (callbackQuery) => {
                     bot.sendPhoto(userId, messageToBroadcast.photo[0].file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
                 } else if (messageToBroadcast.video) {
                     bot.sendVideo(userId, messageToBroadcast.video.file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
+                } else if (messageToBroadcast.video_note) {  // Broadcasting Telegram circle video messages
+                    bot.sendVideoNote(userId, messageToBroadcast.video_note.file_id, { reply_markup: messageToBroadcast.reply_markup });
                 } else if (messageToBroadcast.document) {
                     bot.sendDocument(userId, messageToBroadcast.document.file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
                 } else if (messageToBroadcast.audio) {
