@@ -156,11 +156,15 @@ bot.on('message', async (msg) => {
 
         // Send the message back to the admin for confirmation
         if (msg.text) {
-            await bot.sendMessage(chatId, msg.text);
+            await bot.sendMessage(chatId, msg.text, { reply_markup: msg.reply_markup });
         } else if (msg.photo) {
-            await bot.sendPhoto(chatId, msg.photo[0].file_id, { caption: msg.caption });
+            await bot.sendPhoto(chatId, msg.photo[0].file_id, { caption: msg.caption, reply_markup: msg.reply_markup });
         } else if (msg.video) {
-            await bot.sendVideo(chatId, msg.video.file_id, { caption: msg.caption });
+            await bot.sendVideo(chatId, msg.video.file_id, { caption: msg.caption, reply_markup: msg.reply_markup });
+        } else if (msg.document) {
+            await bot.sendDocument(chatId, msg.document.file_id, { caption: msg.caption, reply_markup: msg.reply_markup });
+        } else if (msg.audio) {
+            await bot.sendAudio(chatId, msg.audio.file_id, { caption: msg.caption, reply_markup: msg.reply_markup });
         }
 
         // Send the confirmation message with Approve and Decline buttons
@@ -191,11 +195,15 @@ bot.on('callback_query', async (callbackQuery) => {
             // Broadcast the message to all users
             userIds.forEach(userId => {
                 if (messageToBroadcast.text) {
-                    bot.sendMessage(userId, messageToBroadcast.text);
+                    bot.sendMessage(userId, messageToBroadcast.text, { reply_markup: messageToBroadcast.reply_markup });
                 } else if (messageToBroadcast.photo) {
-                    bot.sendPhoto(userId, messageToBroadcast.photo[0].file_id, { caption: messageToBroadcast.caption });
+                    bot.sendPhoto(userId, messageToBroadcast.photo[0].file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
                 } else if (messageToBroadcast.video) {
-                    bot.sendVideo(userId, messageToBroadcast.video.file_id, { caption: messageToBroadcast.caption });
+                    bot.sendVideo(userId, messageToBroadcast.video.file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
+                } else if (messageToBroadcast.document) {
+                    bot.sendDocument(userId, messageToBroadcast.document.file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
+                } else if (messageToBroadcast.audio) {
+                    bot.sendAudio(userId, messageToBroadcast.audio.file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
                 }
             });
 
