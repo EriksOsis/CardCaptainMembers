@@ -2,6 +2,14 @@ const TelegramBot = require('node-telegram-bot-api');
 const token = '7414755195:AAEECs9JCxuCYzq0HL2xfpER0UyKmYzMNAI'; // Replace with your bot token
 const bot = new TelegramBot(token, { polling: true });
 const admin = require('firebase-admin');
+const express = require('express');
+const app = express();
+
+const PORT = process.env.PORT || 5000;  // Use PORT provided by Heroku or default to 5000 locally
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
 
 // Admin User ID (Replace with your own Telegram User ID)
 const ADMIN_USER_ID = 123456789; // Replace with your actual admin ID
