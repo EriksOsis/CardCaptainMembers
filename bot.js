@@ -150,7 +150,7 @@ bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
 
     // If the admin is sending a message for broadcast
-    if (chatId === ADMIN_USER_IDS && broadcastData[chatId] && broadcastData[chatId].step === 'waiting_for_message') {
+    if (isAdmin(chatId) && broadcastData[chatId] && broadcastData[chatId].step === 'waiting_for_message') {
         // Save the message (it could include text, photos, videos, etc.)
         broadcastData[chatId] = { message: msg, step: 'confirming' };
 
