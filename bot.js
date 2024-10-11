@@ -29,6 +29,10 @@ const db = admin.firestore(); // Firestore database instance
 // Store broadcast data temporarily
 let broadcastData = {};
 
+function isAdmin(userId) {
+    return ADMIN_USER_IDS.includes(userId); // Check if the user ID is in the admin list
+}
+
 // Function to add a user to Firestore
 async function addUser(userId) {
     const userRef = db.collection('users').doc(userId.toString());
@@ -131,13 +135,15 @@ By following these steps, you can leverage CardCaptain's precision and maximize 
 bot.onText(/\/broadcast$/, (msg) => {
     const chatId = msg.chat.id;
 
-    if (chatId === ADMIN_USER_ID) {
+    // Check if the user is one of the admins
+    if (isAdmin(chatId)) {
         broadcastData[chatId] = { step: 'waiting_for_message' }; // Set the step to waiting for a message
         bot.sendMessage(chatId, "Send me the message you wish to broadcast.");
     } else {
         bot.sendMessage(chatId, "You are not authorized to broadcast.");
     }
 });
+
 
 // Handle incoming messages for broadcasting
 bot.on('message', async (msg) => {
@@ -174,7 +180,8 @@ bot.on('callback_query', async (callbackQuery) => {
     const chatId = callbackQuery.message.chat.id;
     const data = callbackQuery.data;
 
-    if (chatId === ADMIN_USER_ID && broadcastData[chatId]) {
+    // Check if the user is one of the admins
+    if (isAdmin(chatId) && broadcastData[chatId]) {
         if (data === 'approve_broadcast') {
             const messageToBroadcast = broadcastData[chatId].message;
 
