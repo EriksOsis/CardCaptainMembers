@@ -12,7 +12,7 @@ app.listen(PORT, () => {
 });
 
 // Admin User ID (Replace with your own Telegram User ID)
-const ADMIN_USER_ID = [451263123, 926460821]; // Replace with your actual admin ID
+const ADMIN_USER_IDS = [451263123, 926460821]; // Replace with your actual admin ID
 
 // Path to your image and video (replace with correct paths)
 const imagePath = 'photo_2024-10-11 13.36.36.jpeg';
