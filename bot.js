@@ -100,7 +100,7 @@ bot.on('callback_query', (callbackQuery) => {
 
     if (data === 'instruction') {
         // Send the next video first, then the text
-        bot.sendVideo(chatId, videoPath2, { width: 640, height: 360 }).then(() => {
+        bot.sendVideo(chatId, videoPath2, { width: 9, height: 16 }).then(() => {
             // After the video is sent, send the instructional message with "GO BACK" button
             bot.sendMessage(chatId, `🖥 Powered by OpenAI's cutting-edge neural network cluster [ChatGPT-4], CardCaptain has been trained through an intensive process, playing over 8,000 blackjack games to perfect its strategy.
 
