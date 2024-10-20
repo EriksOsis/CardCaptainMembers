@@ -87,7 +87,7 @@ bot.on('callback_query', (callbackQuery) => {
 
 2. If you try to avoid My link or google it, you will not be able to activate Card Captain BOT!🤖
 
-3. After successful registration and deposit send a screenshot to @`, {
+3. After successful registration and deposit send a screenshot to @cardcaptainceo`, {
                 reply_markup: {
                     inline_keyboard: [
                         [{ text: "REGISTER HERE♠️", url: 'https://maxsp.in/0vJqL' }],
