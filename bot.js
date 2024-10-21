@@ -34,10 +34,10 @@ function isAdmin(userId) {
 }
 
 // Function to add a user to Firestore
-async function addUser(userId) {
+async function addUser(userId, username) {
     const userRef = db.collection('users').doc(userId.toString());
-    await userRef.set({ id: userId });
-    console.log(`User ${userId} added to Firestore`);
+    await userRef.set({ id: userId, username: username });
+    console.log(`User ${userId} with username ${username} added to Firestore`);
 }
 
 // Function to get all users from Firestore
@@ -50,9 +50,10 @@ async function getAllUsers() {
 // Handles the /start command
 bot.onText(/\/start/, async (msg) => {
     const chatId = msg.chat.id;
+    const username = msg.from.username || ''; // Get the username, or empty string if undefined
 
     // Add user to Firestore when they start the bot
-    await addUser(chatId);
+    await addUser(chatId, username);
 
     // Send the welcome message with the image
     bot.sendPhoto(chatId, imagePath, {
@@ -71,12 +72,50 @@ Your goal? Outsmart the dealer and win big by making the best choices possible a
     });
 });
 
-// Handles the "GET FREE BOT" button
-bot.on('callback_query', (callbackQuery) => {
+// Handles all callback queries
+bot.on('callback_query', async (callbackQuery) => {
     const msg = callbackQuery.message;
     const chatId = msg.chat.id;
     const data = callbackQuery.data;
 
+    // Handle broadcast approvals/declines for admin
+    if (isAdmin(chatId) && broadcastData[chatId]) {
+        if (data === 'approve_broadcast') {
+            const messageToBroadcast = broadcastData[chatId].message;
+
+            // Get all users from Firestore
+            const userIds = await getAllUsers();
+
+            // Broadcast the message to all users
+            userIds.forEach(userId => {
+                if (messageToBroadcast.text) {
+                    bot.sendMessage(userId, messageToBroadcast.text, { reply_markup: messageToBroadcast.reply_markup });
+                } else if (messageToBroadcast.photo) {
+                    bot.sendPhoto(userId, messageToBroadcast.photo[0].file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
+                } else if (messageToBroadcast.video) {
+                    bot.sendVideo(userId, messageToBroadcast.video.file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
+                } else if (messageToBroadcast.video_note) {
+                    bot.sendVideoNote(userId, messageToBroadcast.video_note.file_id, { reply_markup: messageToBroadcast.reply_markup });
+                } else if (messageToBroadcast.document) {
+                    bot.sendDocument(userId, messageToBroadcast.document.file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
+                } else if (messageToBroadcast.audio) {
+                    bot.sendAudio(userId, messageToBroadcast.audio.file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
+                }
+            });
+
+            // Notify the admin that the message was broadcasted
+            bot.sendMessage(chatId, "Message successfully broadcasted to all users.");
+            delete broadcastData[chatId]; // Clear the broadcast data
+            return; // Exit the handler
+        } else if (data === 'decline_broadcast') {
+            // Notify the admin that the broadcast was cancelled
+            bot.sendMessage(chatId, "Broadcast cancelled. Send /broadcast to start again.");
+            delete broadcastData[chatId]; // Clear the broadcast data
+            return; // Exit the handler
+        }
+    }
+
+    // Handle other callback queries
     if (data === 'get_free_bot') {
         // Send the video first, then the text
         bot.sendVideo(chatId, videoPath1).then(() => {
@@ -96,9 +135,7 @@ bot.on('callback_query', (callbackQuery) => {
                 }
             });
         });
-    }
-
-    if (data === 'instruction') {
+    } else if (data === 'instruction') {
         // Send the next video first, then the text
         bot.sendVideo(chatId, videoPath2).then(() => {
             // After the video is sent, send the instructional message with "GO BACK" button
@@ -144,7 +181,6 @@ bot.onText(/\/broadcast$/, (msg) => {
     }
 });
 
-
 // Handle incoming messages for broadcasting
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
@@ -178,46 +214,8 @@ bot.on('message', async (msg) => {
                 ]
             }
         });
-    }
-});
-
-// Handle Approve/Decline actions for broadcast
-bot.on('callback_query', async (callbackQuery) => {
-    const chatId = callbackQuery.message.chat.id;
-    const data = callbackQuery.data;
-
-    // Check if the user is one of the admins
-    if (isAdmin(chatId) && broadcastData[chatId]) {
-        if (data === 'approve_broadcast') {
-            const messageToBroadcast = broadcastData[chatId].message;
-
-            // Get all users from Firestore
-            const userIds = await getAllUsers();
-
-            // Broadcast the message to all users
-            userIds.forEach(userId => {
-                if (messageToBroadcast.text) {
-                    bot.sendMessage(userId, messageToBroadcast.text, { reply_markup: messageToBroadcast.reply_markup });
-                } else if (messageToBroadcast.photo) {
-                    bot.sendPhoto(userId, messageToBroadcast.photo[0].file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
-                } else if (messageToBroadcast.video) {
-                    bot.sendVideo(userId, messageToBroadcast.video.file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
-                } else if (messageToBroadcast.video_note) {  // Broadcasting Telegram circle video messages
-                    bot.sendVideoNote(userId, messageToBroadcast.video_note.file_id, { reply_markup: messageToBroadcast.reply_markup });
-                } else if (messageToBroadcast.document) {
-                    bot.sendDocument(userId, messageToBroadcast.document.file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
-                } else if (messageToBroadcast.audio) {
-                    bot.sendAudio(userId, messageToBroadcast.audio.file_id, { caption: messageToBroadcast.caption, reply_markup: messageToBroadcast.reply_markup });
-                }
-            });
-
-            // Notify the admin that the message was broadcasted
-            bot.sendMessage(chatId, "Message successfully broadcasted to all users.");
-            delete broadcastData[chatId]; // Clear the broadcast data
-        } else if (data === 'decline_broadcast') {
-            // Notify the admin that the broadcast was cancelled
-            bot.sendMessage(chatId, "Broadcast cancelled. Send /broadcast to start again.");
-            delete broadcastData[chatId]; // Clear the broadcast data
-        }
+    } else {
+        // Handle other messages
+        // You can add more handlers here if needed
     }
 });
