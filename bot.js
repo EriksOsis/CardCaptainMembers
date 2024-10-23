@@ -129,7 +129,7 @@ bot.on('callback_query', async (callbackQuery) => {
 3. After successful registration and deposit send a screenshot to @cardcaptainceo`, {
                 reply_markup: {
                     inline_keyboard: [
-                        [{ text: "REGISTER HERE♠️", url: 'https://maxsp.in/0vJqL' }],
+                        [{ text: "REGISTER HERE♠️", url: 'https://card-captain.com/get/bot' }],
                         [{ text: "INSTRUCTIONS📚", callback_data: 'instruction' }]
                     ]
                 }
