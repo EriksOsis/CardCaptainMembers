@@ -126,7 +126,7 @@ bot.on('callback_query', async (callbackQuery) => {
 
 2. If you try to avoid My link or google it, you will not be able to activate Card Captain BOT!🤖
 
-3. After successful registration and deposit send a screenshot to @cardcaptainceo`, {
+3. After successful registration and deposit send a screenshot to @BossCaptain`, {
                 reply_markup: {
                     inline_keyboard: [
                         [{ text: "REGISTER HERE♠️", url: 'https://card-captain.com/get/bot' }],
